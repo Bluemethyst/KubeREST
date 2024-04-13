@@ -2,11 +2,9 @@ package dev.bluemethyst.mods.kuberest.bindings;
 
 import dev.bluemethyst.mods.kuberest.net.KubeRESTEvent;
 import dev.bluemethyst.mods.kuberest.KubeREST;
-import com.sun.net.httpserver.HttpServer;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
-
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -16,9 +14,10 @@ import java.util.function.Consumer;
 public interface KubeRESTBindings {
     Map<Integer, HttpServer> servers = new HashMap<>();
 
-    @Info(value = "Host a new WebServer.\n" +
-            "@param {number} port - The port number.\n" +
-            "@param {function} eventConsumer - The event consumer.")
+    @Info(value = """
+            Host a new WebServer.
+            @param {number} port - The port number.
+            @param {function} eventConsumer - The event arrow function.""")
     static void host(int port, Consumer<KubeRESTEvent> eventConsumer) {
         if (port == 25565 || port ==80 || port == 443) {
             KubeREST.LOGGER.error("Ports 25565, 80 and 443 are reserved for Minecraft and HTTP/HTTPS servers.");
@@ -38,8 +37,9 @@ public interface KubeRESTBindings {
         }
     }
 
-    @Info(value = "Stop the server.\n" +
-            "@param {number} port - The port number.")
+    @Info(value = """
+            Stop the server.
+            @param {number} port - The port number.""")
     static void stop(int port) {
         HttpServer server = servers.get(port);
         if (server != null) {
