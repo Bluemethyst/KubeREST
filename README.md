@@ -1,37 +1,100 @@
-## Example KubeJS Addon
-Basically just a quick mod template for KubeJS Addon Mods. I got annoyed setting up new mods for Kube so often, so thats why I made it. Yeah, I'll add more versions later.
-If you're looking to learn how to make a KubeJS Addon, well you're not *really* in the right place, but I'll help you with the basics.
+# KubeREST
 
-* Uses Arch Loom - 1.3 🧵️
-* MC Version 1.20.1 - Forge 47.2.1 🔨️
-* Kube Version - 6.4-build.138 🟪️
-* Rhino Version - 2.2-build.18 🦏️
-* Architectury - 9.1.13 🏗️
+A way to host a simple API/Webpage on a Minecraft server using KubeJs.
 
-#
-### Basic how-to
+![Info Webpage](readme_stuff/infoweb.png)
 
-**1. Download the Mod**             
-* You can use this repo's Template feature to make a new repo for yourself,
-or you can clone it using your terminal:    
-`git clone --branch minecraftversion https://github.com/FooterMan15/ExampleKubeJSAddon`   
-`minecraftversion` being 1.20.1, 1.19.2, etc, plus modloader. I only have 1.20.1 Forge on here right now.
+![Example Api](readme_stuff/testapi.png)
 
-Alternatively if you use an IDE that supports generating projects from templates, you can clone it that way.
+![Error page](readme_stuff/error.png)
 
-After cloning, you can remove the `.git` directory from the mod to initialize your own Github repository.
+## Dependencies
+- [KubeJS](https://www.curseforge.com/minecraft/mc-mods/kubejs)
+- [Rhino](https://www.curseforge.com/minecraft/mc-mods/rhino)
+- [Architectury API](https://www.curseforge.com/minecraft/mc-mods/architectury-api)
+### Recommend but not required
+- [ProbeJS](https://www.curseforge.com/minecraft/mc-mods/probejs)
 
-**2. Open with your favorite Integrated Development Environment (IDE)**          
-* For IntelliJ IDEA, open the cloned mod folder, and run gradle task `ideaSyncTask` to generate run configurations for IDEA. Alternatively you can run gradle task `runClient` to start the game.    
-* For VSCode, you have to open the cloned mod folder, and run gradle task `vscode` to generate launch tasks for VSCode. Alternatively you can run gradle task `runClient` to start the game.      
-* For Eclipse... ehh not really sure, but there is a gradle task for eclipse, called `eclipse`. I have no further info.
+## Example usage:
+```javascript
+ServerEvents.loaded((serverEvent) => { // when the server loads
+    KubeREST.host(8000, (e) => { // host a new webserver on port 8000
+        e.onGet("/*", (request) => { // when something connects on any path other then root
+            request.respondJson( // respond with some Json data
+                {
+                    error: "Invalid endpoint",
+                },
+                404 // and a 404 status code
+            );
+        });
+        e.onGet("/api/stats/*/data", (request) => { // when something connects to /api/stats/*/data where * is a wildcard
+            request.respondJson( // respond with some Json data
+                {
+                    info: "info",
+                    test: "dataaaaaa",
+                    wildcard: request.wildcard, // the wildcard is stored in request.wildcard
+                },
+                200 // and a 200 status code because this was a successful request
+            );
+        });
+        e.onGet("/info", (request) => { // when something connects to /info
+            request.respondHtml( // respond with some HTML data
+                `<!DOCTYPE html> // this is an entire HTML document that will be sent to the client and displayed like a website!
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Minimal Info Page</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 0;
+                                padding: 0;
+                                background-color: #f5f5f5;
+                                color: #333;
+                            }
 
-#
+                            .container {
+                                max-width: 600px;
+                                margin: 20px auto;
+                                padding: 20px;
+                                background-color: #fff;
+                                border-radius: 8px;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            }
 
-### For newbies
-I assume you have come across my repo to make a quick addon mod for Kube. Here's how KubeJS integration is set-up:      
-In this mod, there is a class here: [ExampleKubeJSPlugin](https://github.com/FooterMan15/ExampleKubeJSAddon/blob/master/src/main/java/com/example/exampleaddon/kubejs/ExampleKubeJSPlugin.java)                             
-This is the Plugin class. There you will apply your KubeJS integrations. I won't tell you how to create your integrations, read KubeJS's [README](https://github.com/KubeJS-Mods/KubeJS/blob/2002/README.md#creating-a-plugin).             
-You have to register your Plugin to Kube, otherwise nothing will happen. To do this, get your Plugin Class's full path (For example, `kubejs.dev.bluemethyst.mods.kuberest.ExampleKubeJSPlugin`), and add it to the [kubejs.plugins.txt](https://github.com/FooterMan15/ExampleKubeJSAddon/blob/master/src/main/resources/kubejs.plugins.txt) file.
+                            h1 {
+                                font-size: 28px;
+                                margin-bottom: 20px;
+                            }
 
-Alright, now go play with KubeJS.
+                            p {
+                                font-size: 16px;
+                                line-height: 1.6;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>Welcome to the Info Page</h1>
+                            <h2>There are ${serverEvent.server.playerCount} players online</h2>
+                            <h2>Wildcard: ${request.wildcard}</h2>
+                            <p>This is a super simple, minimal, and clean info page. You can customize it as per your needs.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis felis eget erat tempor lobortis.</p>
+                        </div>
+                    </body>
+                </html>`,
+                200 // and dont forget the status code!
+            );
+        });
+    });
+});
+ServerEvents.unloaded((e) => { // when the server shutsdown
+    KubeREST.stop(8000); // stop the webserver hosted on port 8000
+});
+```
+
+## Credits
+[FooterMan15](https://github.com/FooterManDev) - KubeJS mod Addon template
+
+[Bluemethyst](https://bluemethyst.dev) - Uh... being cool idk, once again :P
