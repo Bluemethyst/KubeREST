@@ -1,6 +1,7 @@
 # KubeREST
+## Should you use this? no. Is this secure? no. Why did I make this? just to spite Lat and use networking in KubeJS :D
 
-A way to host a simple API/Webpage on a Minecraft server using KubeJs.
+A way to host a simple API/Webpage on a Minecraft server using KubeJS. 
 
 ![Info Webpage](readme_stuff/infoweb.png)
 
